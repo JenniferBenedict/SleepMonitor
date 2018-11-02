@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
@@ -8,10 +9,30 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="victorine.sleepmonitor.MainActivity">
+    tools:context="victorine.sleepmonitor.MainActivity"
+    android:background="@drawable/bckgrnd">
 
-    <TextView
+    <android.support.design.widget.FloatingActionButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!" />
+        android:id="@+id/toggleRecording"
+        android:layout_marginTop="183dp"
+        android:src="@drawable/ic_action_play"
+        app:elevation="15dp"
+        app:backgroundTint="#EDC55B"
+        app:borderWidth="0dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
+
+    <Button
+        android:text="Sleep Stats"
+        android:layout_width="150dp"
+        android:layout_height="30dp"
+        android:layout_marginTop="83dp"
+        android:id="@+id/statsbutton"
+        android:textColor="@android:color/background_dark"
+        android:background="@android:color/holo_orange_light"
+        android:layout_below="@+id/toggleRecording"
+        android:layout_centerHorizontal="true" />
+
 </RelativeLayout>
