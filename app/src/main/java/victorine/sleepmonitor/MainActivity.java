@@ -34,6 +34,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
     }
+
+    /*will use this to change recorder button from record to stop recording
+    once we implement the recording function*/
     private void setRecorderState(boolean running) {
         ImageView button = (ImageView) findViewById(R.id.toggleRecording);
         if (running) {
