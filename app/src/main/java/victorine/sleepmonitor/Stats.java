@@ -38,7 +38,6 @@ public class Stats extends AppCompatActivity {
     private void plotSleepHours(LineChart chart, Float[] data){
         List<Entry> entries = new ArrayList<>();
         for (int day = 0; day < 7; day++) {
-
             entries.add(new Entry((float)day + 1, data[day]));
         }
         LineDataSet dataSet = new LineDataSet(entries, "Sleep");
