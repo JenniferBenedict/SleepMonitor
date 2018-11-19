@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 26
-    buildToolsVersion '28.0.3'
+    buildToolsVersion '25.0.0'
     defaultConfig {
         applicationId "victorine.sleepmonitor"
         minSdkVersion 15
@@ -34,4 +34,5 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:design:26.0.0-alpha1'
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0-alpha'
+    implementation project(':sleepminder.lib')
 }
