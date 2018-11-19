@@ -15,7 +15,6 @@ public class FileHandler implements OutputHandler {
     @Override
     public void saveData(String data, String identifier) {
         saveFile(data,"recording-" + identifier + ".txt");
-        Hooks.call(Hooks.RECORDING_LIST_UPDATE);
     }
 
     /**

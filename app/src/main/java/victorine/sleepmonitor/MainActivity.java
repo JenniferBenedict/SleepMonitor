@@ -73,9 +73,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 RecordingService.instance.stopSelf();
                 setRecordButton(false);
             } else {
-
-                Hooks.remove(Hooks.RECORDING_LIST_UPDATE);
-
                 // Start the tracking service
                 Intent trackingIntent = new Intent(MainActivity.this, RecordingService.class);
                 MainActivity.this.startService(trackingIntent);
