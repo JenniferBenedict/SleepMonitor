@@ -12,10 +12,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.ToggleButton;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.concurrent.Callable;
 
 import de.sopamo.uni.sleepminder.lib.Recorder;
@@ -78,10 +83,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
     }
-
-
-
-
 
     /*set record button to start or stop depending on whether recorder is running or not*/
     private void setRecordButton(boolean running) {

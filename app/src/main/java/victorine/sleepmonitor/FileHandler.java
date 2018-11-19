@@ -56,6 +56,16 @@ public class FileHandler implements OutputHandler {
         return text.toString();
     }
 
+    /**
+     * Lists all files from the internal storage
+     *
+     * @return The list of internal storage files
+     */
+    public static File[] listFiles() {
+        File internalFiles = getStorageDir();
+        return internalFiles.listFiles();
+    }
+
     private static File getStorageDir() {
         // Get the directory for the app's private pictures directory.
         File file = SleepMonitor.context.getExternalFilesDir("recordings");
