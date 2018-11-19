@@ -1,29 +1,55 @@
 package victorine.sleepmonitor;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.os.Environment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ToggleButton;
 
+import java.util.concurrent.Callable;
+
+import de.sopamo.uni.sleepminder.lib.Recorder;
+
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
     Button stats;
-    ImageView recorder;
-    int recorderStatus = 0;
-
+    ImageView recordButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        recorder = (ImageView ) findViewById(R.id.toggleRecording);
+        recordButton = (ImageView ) findViewById(R.id.toggleRecording);
         stats = (Button) findViewById(R.id.statsbutton);
-        recorder.setOnClickListener(this);
-        stats.setOnClickListener(this);
 
+        if(!isExternalStorageWritable()) {
+            new AlertDialog.Builder(this)
+                    .setTitle("Caution")
+                    .setMessage("The storage is not accessable. Please make sure to insert your sd-card and restart the app.")
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                        }
+                    })
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .show();
+            return;
+        }
+
+        //Initialize the record button to start or stop
+        setRecordButton(SleepMonitor.recorder.isRunning());
+
+        recordButton.setOnClickListener(this);
+        stats.setOnClickListener(this);
     }
 
     @Override
@@ -37,31 +63,42 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Will be updated when recording function is integrated.
          */
         if(view.getId()==R.id.toggleRecording){
-            if (recorderStatus ==0){
-                recorder.setImageResource(R.drawable.ic_action_stop);
-                recorderStatus = 1;
+            if (SleepMonitor.recorder.isRunning()) {
+                // Stop the tracking service
+                RecordingService.instance.stopSelf();
+                setRecordButton(false);
+            } else {
+
+                Hooks.remove(Hooks.RECORDING_LIST_UPDATE);
+
+                // Start the tracking service
+                Intent trackingIntent = new Intent(MainActivity.this, RecordingService.class);
+                MainActivity.this.startService(trackingIntent);
+                setRecordButton(true);
             }
-            else{
-                recorder.setImageResource(R.drawable.ic_action_play);
-                recorderStatus=0;
-            }
-                        }
         }
+    }
 
 
 
 
 
-    /*will use this to change recorder button from record to stop recording
-    once we implement the recording function*/
-    private void setRecorderState(int status) {
+    /*set record button to start or stop depending on whether recorder is running or not*/
+    private void setRecordButton(boolean running) {
         ImageView button = (ImageView) findViewById(R.id.toggleRecording);
-        if (status ==0) {
+        if (running) {
             button.setImageResource(R.drawable.ic_action_stop);
-            status = 1;
         } else {
             button.setImageResource(R.drawable.ic_action_play);
-            status = 0;
         }
+    }
+
+    /*SleepMinder code*/
+    public boolean isExternalStorageWritable() {
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state)) {
+            return true;
+        }
+        return false;
     }
 }
