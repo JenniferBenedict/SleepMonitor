@@ -166,7 +166,7 @@ public class Stats extends AppCompatActivity {
         yAxis.setDrawAxisLine(false); // no axis line
         yAxis.setDrawGridLines(false); // no grid lines
         yAxis.setDrawZeroLine(true); // draw a zero line
-        yAxis.setAxisMaximum(barDataSet.getYMax());
+        yAxis.setAxisMaximum(barDataSet.getYMax() + 0.5f);
         chart.getAxisRight().setEnabled(false); // no right axis
 
         XAxis xAxis = chart.getXAxis();
