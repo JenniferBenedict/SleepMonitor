@@ -25,14 +25,26 @@
         android:layout_centerHorizontal="true" />
 
     <Button
-        android:text="Sleep Stats"
+        android:id="@+id/statsbutton"
         android:layout_width="150dp"
         android:layout_height="30dp"
-        android:layout_marginTop="83dp"
-        android:id="@+id/statsbutton"
-        android:textColor="@android:color/background_dark"
-        android:background="@android:color/holo_orange_light"
         android:layout_below="@+id/toggleRecording"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="83dp"
+        android:background="@android:color/holo_orange_light"
+        android:text="View Sleep Data"
+        android:textColor="@android:color/background_dark" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="88dp"
+        android:text="Sleep EZ"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+        android:textColor="@android:color/holo_orange_light"
+        android:textSize="36sp" />
 
 </RelativeLayout>
