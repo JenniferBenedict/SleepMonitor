@@ -13,16 +13,16 @@
     android:background="@drawable/bckgrnd">
 
     <android.support.design.widget.FloatingActionButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:id="@+id/toggleRecording"
+        android:layout_width="102dp"
+        android:layout_height="101dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
         android:layout_marginTop="183dp"
         android:src="@drawable/ic_action_play"
-        app:elevation="15dp"
         app:backgroundTint="#EDC55B"
         app:borderWidth="0dp"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" />
+        app:elevation="15dp" />
 
     <Button
         android:id="@+id/statsbutton"
