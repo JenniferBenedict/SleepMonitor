@@ -12,6 +12,7 @@ import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.Description;
+import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
@@ -37,8 +38,10 @@ public class Stats extends AppCompatActivity {
         setContentView(R.layout.stats_screen);
         ListView nightList = (ListView) findViewById(R.id.sleeplist);
         BarChart chart = (BarChart) findViewById(R.id.chart);
+        TextView recommendation = (TextView) findViewById(R.id.recommendation);
 
         SleepRecord[] records = new SleepRecord[7];
+        float totalSleepPast7Days = 0;
 
         ArrayList<File> nightsList = new ArrayList<>(Arrays.asList(FileHandler.listFiles()));
         Object[] nights = nightsList.toArray();
@@ -56,25 +59,27 @@ public class Stats extends AppCompatActivity {
 
             String[] parts = content.split(";");
             int num5SecondIntervals = parts.length - 1;
+            float totalSleep =  num5SecondIntervals * 5f / 3600f;
+            totalSleepPast7Days += totalSleep;
 
             records[index].setDay(date.getDay());
             records[index].setDate(new SimpleDateFormat("MM/dd").format(date));
 
             // 25 minute intervals
-            int[] intervals = new int[(int)Math.ceil(parts.length/300f)];
+            int[] intervals = new int[(int) Math.ceil(parts.length / 300f)];
 
             int movements = 0;
 
             int awake = 0;
             int sleep = 0;
 
-            for(int i = 1; i<parts.length; i++) {
+            for (int i = 1; i < parts.length; i++) {
                 String[] values = parts[i].split(" ");
-                if(values[1].equals("2")) {
+                if (values[1].equals("2")) {
                     movements++;
                 }
 
-                if(i % 300 == 0 || i == parts.length - 1) {
+                if (i % 300 == 0 || i == parts.length - 1) {
                     // Add the movement interval
                     if (movements > 1) {
                         intervals[(int) (i / 300f)] = movements;
@@ -89,19 +94,19 @@ public class Stats extends AppCompatActivity {
             int phases = 0;
             boolean isSleeping = false;
 
-            for(int i = 0;i<intervals.length;i++) {
+            for (int i = 0; i < intervals.length; i++) {
                 int movementAmount = 0;
-                if(intervals[i] > 2) {
+                if (intervals[i] > 2) {
                     movementAmount = intervals[i];
                 }
 
-                if(movementAmount > 2) {
-                    if(isSleeping) {
+                if (movementAmount > 2) {
+                    if (isSleeping) {
                         phases++;
                         isSleeping = false;
                     }
                 } else {
-                    if(!isSleeping) {
+                    if (!isSleeping) {
                         isSleeping = true;
                     }
                 }
@@ -109,32 +114,56 @@ public class Stats extends AppCompatActivity {
 
             int qualityPhases = 1;
             // Too much phases are no good sign
-            if(phases > 10 || phases < 4) {
+            if (phases > 10 || phases < 4) {
                 qualityPhases = 0;
             }
 
             int qualitySleep = -1;
-            if(parts.length >= 0.2 * 60*60*7) {
+            if (parts.length >= 0.2 * 60 * 60 * 7) {
                 // At least 7 hours of sleep
                 qualitySleep = 1;
-            } else if(parts.length >= 0.2 * 60*60*5.5) {
+            } else if (parts.length >= 0.2 * 60 * 60 * 5.5) {
                 // At least 5.5 hours of sleep
                 qualitySleep = 0;
             }
 
-            float totalHoursSlept = num5SecondIntervals * 5f / 3600f;
-            float percentLightSleep = awake / (float)(awake + sleep) * 100;
-            float percentDeepSleep = sleep / (float)(awake + sleep) * 100;
+            float totalHoursSlept = totalSleep;
+            float percentLightSleep = awake / (float) (awake + sleep) * 100;
+            float percentDeepSleep = sleep / (float) (awake + sleep) * 100;
 
             records[index].setTotalSleep(totalHoursSlept);
             records[index].setDeepSleep(percentDeepSleep);
             records[index].setLightSleep(percentLightSleep);
         }
 
+        float avgSleepHoursPast7Days = totalSleepPast7Days / Math.min(nights.length, 7);
+
+        displayAverageSleepRecommendation(recommendation, avgSleepHoursPast7Days);
         plotSleepHours(chart, records);
         displaySleepDetails(nightList, records);
     }
 
+    /**
+     * Displays a recommendation to the user based on their avg sleep from the past 7 days.
+     *
+     * @param textView
+     *      the TextView.
+     * @param avgSleepPast7Days
+     *      the average sleep from the past 7 days
+     */
+    private void displayAverageSleepRecommendation(TextView textView, float avgSleepPast7Days) {
+        textView.setText("You've been getting an average of " + convertHours(avgSleepPast7Days) + " sleep over the last week. ");
+        if (avgSleepPast7Days > 7){
+            textView.append("Keep it up!");
+            textView.setBackgroundColor(0xFF006600);
+        } else if (avgSleepPast7Days > 5.5){
+            textView.append("You may need a little more for optimal health.");
+            textView.setBackgroundColor(0xFF0000ff);
+        } else {
+            textView.append("Try getting to bed earlier for a good night's rest.");
+            textView.setBackgroundColor(0xFFd36b6b);
+        }
+    }
 
     /**
      * Plots the number of hours slept during each day of the previous week.
@@ -151,7 +180,7 @@ public class Stats extends AppCompatActivity {
         for (int i = 0; i < data.length; i++) {
             if (data[data.length - i - 1] != null){
                 entries.add(new BarEntry(i, data[data.length - i - 1].getTotalSleep()));
-                xVals[i] = data[data.length - i - 1].getDate();
+                xVals[i] = getCorrespondingDay(data[data.length - i - 1].getDay());
             }
             else {
                 entries.add(new BarEntry(i, null));
@@ -190,6 +219,9 @@ public class Stats extends AppCompatActivity {
         chart.setDescription(desc);
 
         chart.setData(barData);
+
+        Legend legend = chart.getLegend();
+        legend.setPosition(Legend.LegendPosition.ABOVE_CHART_LEFT);
 
         chart.invalidate(); // refresh
     }
@@ -243,19 +275,19 @@ public class Stats extends AppCompatActivity {
     private String getCorrespondingDay(int day){
         switch (day){
             case 1:
-                return "Monday";
+                return "Mon";
             case 2:
-                return "Tuesday";
+                return "Tues";
             case 3:
-                return "Wednesday";
+                return "Wed";
             case 4:
-                return "Thursday";
+                return "Thurs";
             case 5:
-                return "Friday";
+                return "Fri";
             case 6:
-                return "Saturday";
+                return "Sat";
             case 0:
-                return "Sunday";
+                return "Sun";
             default:
                 return null;
         }
