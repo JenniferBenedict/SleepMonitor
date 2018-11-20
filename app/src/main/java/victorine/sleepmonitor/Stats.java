@@ -146,10 +146,10 @@ public class Stats extends AppCompatActivity {
         List<BarEntry> entries = new ArrayList<>();
         String[] xVals = new String[data.length];
 
-        for (int i = 0; i < data.length; i++) {
+        for (int i = 0; i < data.length ; i++) {
             if (data[i] != null){
-                entries.add(new BarEntry(i, data[data.length - i - 1].getTotalSleep()));
-                xVals[i] = data[data.length - i - 1].getDate();
+                entries.add(new BarEntry(i, data[i].getTotalSleep()));
+                xVals[i] = data[i].getDate();
             }
         }
 
@@ -168,6 +168,7 @@ public class Stats extends AppCompatActivity {
         yAxis.setDrawZeroLine(true); // draw a zero line
         yAxis.setAxisMaximum(barDataSet.getYMax() + 0.5f);
         chart.getAxisRight().setEnabled(false); // no right axis
+
 
         XAxis xAxis = chart.getXAxis();
         xAxis.setDrawGridLines(false); // no grid lines
