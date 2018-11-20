@@ -40,11 +40,13 @@ public class Stats extends AppCompatActivity {
 
         SleepRecord[] records = new SleepRecord[7];
 
-        ArrayList<File> nights = new ArrayList<>(Arrays.asList(FileHandler.listFiles()));
-        for (int index = 0; index < nights.size() && index < 7; index++){
+        ArrayList<File> nightsList = new ArrayList<>(Arrays.asList(FileHandler.listFiles()));
+        Object[] nights = nightsList.toArray();
+        Arrays.sort(nights);
+        for (int index = 0; index < nights.length && index < 7; index++){
             records[index] = new SleepRecord();
 
-            File night = nights.get(nights.size() - index - 1);
+            File night = (File)nights[nights.length - index - 1];
             String filename = night.getName();
             String timestamp = filename.substring(10,20);
             long dv = Long.valueOf(timestamp)*1000;
@@ -147,9 +149,13 @@ public class Stats extends AppCompatActivity {
         String[] xVals = new String[data.length];
 
         for (int i = 0; i < data.length; i++) {
-            if (data[i] != null){
+            if (data[data.length - i - 1] != null){
                 entries.add(new BarEntry(i, data[data.length - i - 1].getTotalSleep()));
                 xVals[i] = data[data.length - i - 1].getDate();
+            }
+            else {
+                entries.add(new BarEntry(i, null));
+                xVals[i] = "";
             }
         }
 
@@ -167,6 +173,7 @@ public class Stats extends AppCompatActivity {
         yAxis.setDrawGridLines(false); // no grid lines
         yAxis.setDrawZeroLine(true); // draw a zero line
         yAxis.setAxisMaximum(barDataSet.getYMax() + 0.5f);
+        yAxis.setAxisMinimum(0);
         chart.getAxisRight().setEnabled(false); // no right axis
 
         XAxis xAxis = chart.getXAxis();
