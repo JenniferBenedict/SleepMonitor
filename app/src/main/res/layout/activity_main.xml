@@ -12,29 +12,6 @@
     tools:context="victorine.sleepmonitor.MainActivity"
     android:background="@drawable/bckgrnd">
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/toggleRecording"
-        android:layout_width="102dp"
-        android:layout_height="101dp"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="183dp"
-        android:src="@drawable/ic_action_play"
-        app:backgroundTint="#EDC55B"
-        app:borderWidth="0dp"
-        app:elevation="15dp" />
-
-    <Button
-        android:id="@+id/statsbutton"
-        android:layout_width="150dp"
-        android:layout_height="30dp"
-        android:layout_below="@+id/toggleRecording"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="83dp"
-        android:background="@android:color/holo_orange_light"
-        android:text="View Sleep Data"
-        android:textColor="@android:color/background_dark" />
-
     <TextView
         android:id="@+id/textView"
         android:layout_width="wrap_content"
@@ -46,5 +23,40 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Body2"
         android:textColor="@android:color/holo_orange_light"
         android:textSize="36sp" />
+
+    <LinearLayout
+        android:layout_width="164dp"
+        android:layout_height="209dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:layout_centerVertical="true"
+        android:layout_marginEnd="57dp"
+        android:layout_marginRight="57dp"
+        android:layout_marginBottom="146dp">
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/toggleRecording"
+            android:layout_width="99dp"
+            android:layout_height="92dp"
+            android:layout_gravity="center_vertical|center_horizontal"
+            android:src="@drawable/ic_action_play"
+            app:backgroundTint="#EDC55B"
+            app:borderWidth="0dp"
+            app:elevation="15dp" />
+
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/statsbutton"
+        android:layout_width="170dp"
+        android:layout_height="40dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="88dp"
+        android:background="@android:color/holo_orange_light"
+        android:text="View Sleep Data"
+        android:textColor="@android:color/background_dark" />
 
 </RelativeLayout>
