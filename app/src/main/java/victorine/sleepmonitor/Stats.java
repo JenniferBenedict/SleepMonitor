@@ -123,8 +123,8 @@ public class Stats extends AppCompatActivity {
             }
 
             float totalHoursSlept = num5SecondIntervals * 5f / 3600f;
-            float percentLightSleep = awake / (float)(awake + sleep);
-            float percentDeepSleep = sleep / (float)(awake + sleep);
+            float percentLightSleep = awake / (float)(awake + sleep) * 100;
+            float percentDeepSleep = sleep / (float)(awake + sleep) * 100;
 
             records[index].setTotalSleep(totalHoursSlept);
             records[index].setDeepSleep(percentDeepSleep);
@@ -159,7 +159,6 @@ public class Stats extends AppCompatActivity {
             }
         }
 
-
         BarDataSet barDataSet = new BarDataSet(entries, "Total Sleep (in hours)");
         barDataSet.setColor(Color.parseColor("#37ac46"));
         barDataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
@@ -191,6 +190,7 @@ public class Stats extends AppCompatActivity {
         chart.setDescription(desc);
 
         chart.setData(barData);
+
         chart.invalidate(); // refresh
     }
 
@@ -208,14 +208,28 @@ public class Stats extends AppCompatActivity {
             if (data[i] != null){
                 String label = getCorrespondingDay(data[i].getDay())
                         + ", " + data[i].getDate()
-                        + "\n   Total hours slept: " + String.format("%.3f", data[i].getTotalSleep())
-                        + "\n   Deep Sleep %: " + String.format("%.3f", data[i].getDeepSleep())
-                        + "\n   Light Sleep %: " + String.format("%.3f", data[i].getLightSleep());
+                        + "\n   Total Sleep: " + convertHours(data[i].getTotalSleep())
+                        + "\n   Deep Sleep: " + String.format("%.0f", data[i].getDeepSleep()) + "%"
+                        + "\n   Light Sleep: " + String.format("%.0f", data[i].getLightSleep()) + "%";
                 listItems.add(label);
             }
         }
         ArrayAdapter<String> listAdapter = new ArrayAdapter<String>(this, R.layout.row_view,listItems);
         list.setAdapter(listAdapter);
+    }
+
+    /**
+     * Convert a decimal number of hours to the number of hours and minutes it represents
+     *
+     * @param hours
+     *      a decimal number of hours.
+     * @return
+     *      a string representation in hours and minutes.
+     */
+    private String convertHours(float hours){
+        int numHours = (int) hours;
+        int numMinutes = (int)((hours - numHours) * 60);
+        return numHours + "h " + numMinutes + "m";
     }
 
     /**
