@@ -9,7 +9,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.BarChart;
-import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.Legend;
@@ -18,10 +17,6 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
-import com.github.mikephil.charting.data.CombinedData;
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.data.LineData;
-import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 
 import java.io.File;
@@ -43,36 +38,37 @@ public class Stats extends AppCompatActivity {
         SleepRecord[] records = new SleepRecord[7];
         float totalSleepPast7Days = 0;
 
+        //retrieve a list (sorted by timestamp) of all sleep records taken so far
         ArrayList<File> nightsList = new ArrayList<>(Arrays.asList(FileHandler.listFiles()));
         Object[] nights = nightsList.toArray();
         Arrays.sort(nights);
+
+        //handle, at most, only the last 7 sleep records
         for (int index = 0; index < nights.length && index < 7; index++){
             records[index] = new SleepRecord();
 
             File night = (File)nights[nights.length - index - 1];
+
+            //retrieve the exact date of the sleep record
             String filename = night.getName();
             String timestamp = filename.substring(10,20);
-            long dv = Long.valueOf(timestamp)*1000;
-            Date date = new java.util.Date(dv);
-
-            String content = FileHandler.readFile(night);
-
-            String[] parts = content.split(";");
-            int num5SecondIntervals = parts.length - 1;
-            float totalSleep =  num5SecondIntervals * 5f / 3600f;
-            totalSleepPast7Days += totalSleep;
-
+            Date date = new java.util.Date(Long.valueOf(timestamp)*1000);
             records[index].setDay(date.getDay());
             records[index].setDate(new SimpleDateFormat("MM/dd").format(date));
 
-            // 25 minute intervals
-            int[] intervals = new int[(int) Math.ceil(parts.length / 300f)];
+            //retrieve the data from this sleep record
+            String content = FileHandler.readFile(night);
+            String[] parts = content.split(";");
+            int num5SecondIntervals = parts.length - 1;
+
+            //retrieve the total sleep (in hours) of this sleep record
+            float totalSleep =  num5SecondIntervals * 5f / 3600f;
+            totalSleepPast7Days += totalSleep;
+            records[index].setTotalSleep(totalSleep);
 
             int movements = 0;
-
-            int awake = 0;
-            int sleep = 0;
-
+            int lightSleep = 0; // number of 25 minute intervals classified as light sleep
+            int deepSleep = 0; // number of 25 minute intervals classified as deep sleep
             for (int i = 1; i < parts.length; i++) {
                 String[] values = parts[i].split(" ");
                 if (values[1].equals("2")) {
@@ -80,65 +76,27 @@ public class Stats extends AppCompatActivity {
                 }
 
                 if (i % 300 == 0 || i == parts.length - 1) {
-                    // Add the movement interval
+                    //determine if this 25 minute interval was deep or light sleep
                     if (movements > 1) {
-                        intervals[(int) (i / 300f)] = movements;
-                        awake++;
+                        lightSleep++;
                     } else {
-                        sleep++;
+                        deepSleep++;
                     }
                     movements = 0;
                 }
             }
 
-            int phases = 0;
-            boolean isSleeping = false;
-
-            for (int i = 0; i < intervals.length; i++) {
-                int movementAmount = 0;
-                if (intervals[i] > 2) {
-                    movementAmount = intervals[i];
-                }
-
-                if (movementAmount > 2) {
-                    if (isSleeping) {
-                        phases++;
-                        isSleeping = false;
-                    }
-                } else {
-                    if (!isSleeping) {
-                        isSleeping = true;
-                    }
-                }
-            }
-
-            int qualityPhases = 1;
-            // Too much phases are no good sign
-            if (phases > 10 || phases < 4) {
-                qualityPhases = 0;
-            }
-
-            int qualitySleep = -1;
-            if (parts.length >= 0.2 * 60 * 60 * 7) {
-                // At least 7 hours of sleep
-                qualitySleep = 1;
-            } else if (parts.length >= 0.2 * 60 * 60 * 5.5) {
-                // At least 5.5 hours of sleep
-                qualitySleep = 0;
-            }
-
-            float totalHoursSlept = totalSleep;
-            float percentLightSleep = awake / (float) (awake + sleep) * 100;
-            float percentDeepSleep = sleep / (float) (awake + sleep) * 100;
-
-            records[index].setTotalSleep(totalHoursSlept);
+            float percentLightSleep = lightSleep / (float) (lightSleep + deepSleep) * 100;
+            float percentDeepSleep = deepSleep / (float) (lightSleep + deepSleep) * 100;
             records[index].setDeepSleep(percentDeepSleep);
             records[index].setLightSleep(percentLightSleep);
         }
 
+        //compute average sleep for the past 7 records, and display appropriate recommendation
         float avgSleepHoursPast7Days = totalSleepPast7Days / Math.min(nights.length, 7);
-
         displayAverageSleepRecommendation(recommendation, avgSleepHoursPast7Days);
+
+        //plot the overall sleep pattern and display individual sleep data
         plotSleepHours(chart, records);
         displaySleepDetails(nightList, records);
     }
@@ -166,7 +124,7 @@ public class Stats extends AppCompatActivity {
     }
 
     /**
-     * Plots the number of hours slept during each day of the previous week.
+     * Plots the total number of hours slept during each of the past 7 records.
      *
      * @param chart
      *      The chart view.
@@ -235,7 +193,7 @@ public class Stats extends AppCompatActivity {
      *      The last seven records of sleep.
      */
     private void displaySleepDetails(ListView list, SleepRecord[] data){
-        ArrayList<String> listItems = new ArrayList<String>();
+        ArrayList<String> listItems = new ArrayList<>();
         for (int i = 0; i < data.length; i++){
             if (data[i] != null){
                 String label = getCorrespondingDay(data[i].getDay())
@@ -270,7 +228,7 @@ public class Stats extends AppCompatActivity {
      * @param day
      *      An integer from 0-6.
      * @return
-     *      A string representing the appropriate day of the week (0 --> Sunday, 1 --> Monday, etc.)
+     *      A string representing the appropriate day of the week (0 --> Sun, 1 --> Mon, etc.)
      */
     private String getCorrespondingDay(int day){
         switch (day){

@@ -10,7 +10,7 @@ import java.io.IOException;
 
 import de.sopamo.uni.sleepminder.lib.OutputHandler;
 
-/*SleepMinder code*/
+/*SleepMinder code (modified)*/
 public class FileHandler implements OutputHandler {
     @Override
     public void saveData(String data, String identifier) {
@@ -50,8 +50,8 @@ public class FileHandler implements OutputHandler {
             br.close();
         }
         catch (IOException e) {
-            //You'll need to add proper error handling here
         }
+
         return text.toString();
     }
 

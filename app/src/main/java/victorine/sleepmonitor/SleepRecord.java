@@ -11,14 +11,6 @@ public class SleepRecord {
 
     }
 
-    public SleepRecord(int day, String date, int total_sleep, double light_sleep, double deep_sleep) {
-        this.day = day;
-        this.date = date;
-        this.total_sleep = total_sleep;
-        this.light_sleep = light_sleep;
-        this.deep_sleep = deep_sleep;
-    }
-
     public int getDay() {
         return day;
     }

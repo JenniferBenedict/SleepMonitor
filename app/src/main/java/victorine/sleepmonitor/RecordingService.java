@@ -8,7 +8,7 @@ import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 
-/*SleepMinder code*/
+/*SleepMinder code (modified)*/
 public class RecordingService extends Service {
 
     private final int ONGOING_NOTIFICATION_ID = 1;
@@ -30,13 +30,11 @@ public class RecordingService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-
         // Show the "we are tracking" notification
         startForeground(ONGOING_NOTIFICATION_ID, getNotification());
 
         // Start the tracker
         SleepMonitor.recorder.start(SleepMonitor.context, new FileHandler());
-
         return START_STICKY;
     }
 
